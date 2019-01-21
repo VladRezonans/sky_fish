@@ -1,0 +1,10 @@
+body {
+	background-color: black;
+}
+
+#screen {
+	height: 99%;
+	width:	99%;
+	border: 1px #000066 solid;
+}
+
