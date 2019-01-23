@@ -7,9 +7,10 @@ tScene = function() {
 	this.maxkMeteorite = 12;	
 	this.currentCellX = 0;
 	this.currentCellY = 0;
-	this.elements = [];
 
 	this.mineralShowCount = 0;
+	this.elements = [];
+	this.add(shatl);	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.build = function() {
@@ -21,9 +22,7 @@ tScene.prototype.build = function() {
 	sceneX = this.currentCellX * this.dX;
 	sceneY = this.currentCellY * this.dY;
 
-	this.setViewSpace();	
-	this.add(shatl);	
-	
+	this.setViewSpace();
 	this.initStars();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------

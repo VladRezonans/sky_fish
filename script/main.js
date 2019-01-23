@@ -4,8 +4,8 @@ function start() {
 	document.onkeyup = onKeyUp;
 	window.onresize = onResize;
 
-	scene = new tScene();
 	shatl = new tShatl();
+	scene = new tScene();	
 	panel = new tPanel();		
 
 	initCanvas();
@@ -16,7 +16,7 @@ function initCanvas() {
 	canvas = document.getElementById('canvas');	
 	canvas.width = document.getElementById('screen').clientWidth;
 	canvas.height = document.getElementById('screen').clientHeight;	
-	ctx = canvas.getContext('2d');	
+	ctx = canvas.getContext('2d');
 
 	scene.build();
 	panel.build();
@@ -51,7 +51,7 @@ function onKeyDown(evt) {
 				case 50: shatl.switchMissile('smartMissile');  break;
 				case 51: shatl.switchMissile('plazmaMissile'); break;
 				case 52: shatl.switchMissile('megaMissile');   break;
-			}			
+			}
 		}         
 	} 	
 }
