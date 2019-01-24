@@ -43,6 +43,7 @@ function onKeyDown(evt) {
 				
 				case 65: shatl.targetsSwitch();           break;
 				case 67: shatl.bang(); 			  break;
+				case 71: shatl.switchGun(); 		  break;
 				case 83: shatl.helmStabilizationSwitch(); break;
 				case 86: shatl.startRocket();             break;
 				case 90: shatl.cruiseControlSwitch();     break;
@@ -76,8 +77,7 @@ function onKeyUp(evt) {
 }
 //----------------------------------------------------------------------------------------------------------	
 function gameTimer() {	
-	scene.show();
-	panel.show();	
+	scene.render();	
 	setTimeout(gameTimer, 1); 
 }
 //----------------------------------------------------------------------------------------------------------	

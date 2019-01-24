@@ -10,8 +10,10 @@ tScene = function() {
 
 	this.mineralShowCount = 0;
 	this.elements = [];
-	this.add(shatl);	
-}
+	this.add(shatl);
+
+	this.delayScreen = [];	
+}	
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.build = function() {
 	this.X2 = canvas.width;
@@ -23,7 +25,7 @@ tScene.prototype.build = function() {
 	sceneY = this.currentCellY * this.dY;
 
 	this.setViewSpace();
-	this.initStars();
+	this.initStars();	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.setViewSpace = function() {
@@ -33,22 +35,27 @@ tScene.prototype.setViewSpace = function() {
 	this.viewY2 = sceneY + this.dY + 200;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tScene.prototype.show = function() {				
+tScene.prototype.render = function() {	
+	this.engine();
+	this.show();	
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.engine = function() {	
 	this.removeGarbage();
-
-	for (var i = 0; i < this.elements.length; i++) this.elements[i].engine();
-	
+	this.engineElements();	
 	this.move();
 	this.checkSpaceCell();
 	this.checkMeteorite();	
-
 	this.physical();
-			
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.show = function() {
 	this.mineralShowCount = 0;
 	for (var i = 0; i < this.elements.length; i++) {
 		if (this.elements[i].type == 'star') this.elements[i].show(); 
 		else if (this.isPresentScene(this.elements[i])) this.elements[i].show();				 
-	}	
+	}
+	panel.show();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.isPresentScene = function(ob) {
@@ -154,9 +161,9 @@ tScene.prototype.initStars = function() {
 	}	
 	this.removeGarbage();	
 
-	for (dx = -2; dx < 3; dx++) {
+	for (dx = -3; dx < 4; dx++) {
 		x = this.currentCellX + dx;
-		for (dy = -2; dy < 3; dy++) { 
+		for (dy = -3; dy < 4; dy++) { 
                         y = this.currentCellY + dy;						
 			
 			Math.seedrandom("x: " + x + ", y: " + y);
@@ -173,12 +180,22 @@ tScene.prototype.initStars = function() {
 	}	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tScene.prototype.move = function() {
-	if (shatl.x < sceneX + 0.15 * this.dX) sceneX = shatl.x - 0.15 * this.dX;
-	if (shatl.y < sceneY + 0.15 * this.dY) sceneY = shatl.y - 0.15 * this.dY;
-	if (shatl.x > sceneX + 0.85 * this.dX) sceneX = shatl.x - 0.85 * this.dX;
-	if (shatl.y > sceneY + 0.85 * this.dY) sceneY = shatl.y - 0.85 * this.dY;
+tScene.prototype.move = function() {	
+	var mDx = shatl.dx/shatl.maxSpeed * 0.7;
+	var mDy = shatl.dy/shatl.maxSpeed * 0.7;
 
+	this.delayScreen.push({ mDx: mDx, mDy: mDy });
+	var h = (this.delayScreen.length < 100) ? this.delayScreen[0] : this.delayScreen.shift();
+
+	for(var i = 0; i < this.delayScreen.length; i++) { h.mDx += this.delayScreen[i].mDx; h.mDy += this.delayScreen[i].mDy };
+	h.mDx = h.mDx/(this.delayScreen.length + 1);
+	h.mDy = h.mDy/(this.delayScreen.length + 1);
+	
+	if (shatl.x < sceneX + 0.15 * this.dX - h.mDx * this.dX) sceneX = shatl.x - 0.15 * this.dX + h.mDx * this.dX;
+	if (shatl.y < sceneY + 0.15 * this.dY - h.mDy * this.dY) sceneY = shatl.y - 0.15 * this.dY + h.mDy * this.dY;
+	if (shatl.x > sceneX + 0.85 * this.dX - h.mDx * this.dX) sceneX = shatl.x - 0.85 * this.dX + h.mDx * this.dX;
+	if (shatl.y > sceneY + 0.85 * this.dY - h.mDy * this.dY) sceneY = shatl.y - 0.85 * this.dY + h.mDy * this.dY;
+	
 	this.setViewSpace();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -284,5 +301,9 @@ tScene.prototype.removeGarbage = function() {
 		else this.elements[i].hide();
 	}
 	this.elements = result;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.engineElements = function() {
+	for (var i = 0; i < this.elements.length; i++) this.elements[i].engine();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------

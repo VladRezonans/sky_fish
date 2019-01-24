@@ -26,15 +26,17 @@ function tReward(params) {
 	this.globalScore = 200;	
 	this.score = 20;
 	
-	this.kinds = ['cooldown', 'drag', 'cruise', 'stability', 'targets', 'shield', 'heavyMissile', 'smartMissile', 'plazmaMissile', 'megaMissile'];
+	this.kinds = ['cooldown', 'drag', 'cruise', 'stability', 'targets', 'shield', 'heavyMissile', 'smartMissile', 'plazmaMissile', 'megaMissile', 'gun'];
 	this.rockets = { heavyMissile: 18, smartMissile: 16, plazmaMissile: 6, megaMissile: 4 };
 
 	this.kind = this.getKind();	
 	this.setParam(params);
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
-tReward.prototype.getKind = function() {	
-	var choice = diffArray(this.kinds, Object.keys(shatl.tools));
+tReward.prototype.getKind = function() {
+	Math.seedrandom();
+
+	var choice = diffArray(this.kinds, Object.keys(shatl.tools));		
 	return choice[Math.floor(Math.random() * choice.length)];
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,6 +93,9 @@ tReward.prototype.giveToShatl = function() {
 		if ( !shatl.missileCounts[this.kind] ) shatl.missileCounts[this.kind] = 0;
 		shatl.missileCounts[this.kind] += this.rockets[this.kind];		
 		
+	} else if (this.kind == 'gun') {		
+		shatl.increaseMaxGunKind();
+	
 	} else {
 		shatl.tools[this.kind] = true;
 	}	

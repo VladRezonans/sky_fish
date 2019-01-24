@@ -59,6 +59,23 @@ function isEqualHash(a, b) {
 	return isContainsHash(a, b) && isContainsHash(b, a);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
+function isEqualArray(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length != b.length) return false;
+
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+function copyArrays(b) {
+	var a = [];
+	for (var i = 0; i < b.length; i ++) a[i] = b[i];
+	return a;	
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 function diffArray(a, b) {
 	var check, c = [];
 

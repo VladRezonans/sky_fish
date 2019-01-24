@@ -30,20 +30,16 @@ function tShatl() {
 	this.oldRightPowerValue = 0.0;
 	this.oldDragPowerValue = 0.0;
 
-	this.cooldownGun = 0;
 	this.maxSpeed = 14.0;
 	this.maxPower = 0.02;
 	this.maxDragPower = 0.005;
 	this.maxHelmPower = 0.0005;
-	this.maxCooldownGun = 4.0;
 	this.shieldValue = 0;
 	this.maxShieldValue = 100;
-
-	this.rokcetPoint = 1;
-	this.missileKind = '';
-	this.missileCounts = {};	
-
-	this.setTools();	
+	
+	this.setTools();
+	this.setGuns();
+	this.setRockets();
 	
 	this.score = 0;
 }
@@ -55,6 +51,31 @@ tShatl.prototype.setTools = function() {
 	this.shieldPower = false;
 		
 	this.tools = { cooldown: true, stability: true, targets: true };	
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tShatl.prototype.setGuns = function() {
+	this.cooldownGun = 0;
+	this.maxCooldownGun = 4.0;
+	this.gunKind = 0;
+	this.maxGunKind = 0;
+	
+	this.guns = [ new tSingleGun(), new tDoubleGun(), new tTripleGun(), new tMultiGun(), new tPowerGun() ];	
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tShatl.prototype.increaseMaxGunKind = function() {	
+	if (this.maxGunKind < this.guns.length - 1) this.maxGunKind++;
+	if (this.gunKind == this.maxGunKind - 1) {
+		this.gunKind = this.maxGunKind;
+		this.maxCooldownGun = this.guns[this.gunKind].maxCooldownGun;
+	}
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tShatl.prototype.setRockets = function() {
+	this.cooldownRocket = 0;
+	this.maxCooldownRocket = 12.0;
+	this.rokcetPoint = 1;
+	this.missileKind = '';
+	this.missileCounts = {};	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.turnOn = function() {
@@ -134,6 +155,12 @@ tShatl.prototype.switchMissile = function(kind) {
 	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
+tShatl.prototype.switchGun = function() {
+	this.gunKind++;
+	if (this.gunKind > this.maxGunKind) this.gunKind = 0;
+	this.maxCooldownGun = this.guns[this.gunKind].maxCooldownGun;
+}			
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.engineShield = function() {
 	if (!this.tools.shield) return;
 	
@@ -212,7 +239,10 @@ tShatl.prototype.engine = function() {
 	this.y += this.dy;
 
 	this.cooldownGun -= 0.1;
-	if (this.cooldownGun < 0) this.cooldownGun = 0;	
+	if (this.cooldownGun < 0) this.cooldownGun = 0;
+
+	this.cooldownRocket -= 0.1;
+	if (this.cooldownRocket	< 0) this.cooldownRocket = 0;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.shadowTail = function(x, y, a,  v, color) {
@@ -442,28 +472,16 @@ tShatl.prototype.show = function() {
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.bang = function() {
-	var dx, dy;	
-	
         if (this.cooldownGun > 0) return;
 
-	dx = this.dx + 15 * Math.sin(this.a);
-	dy = this.dy + 15 * Math.cos(this.a);
-
-	var plazma = new tPlazma();
-	plazma.setParam({ x: this.x, 
-			  y: this.y, 
-                          dx: dx, 
-                          dy: dy,
-			  m: 10.0 });
-	this.cooldownGun = this.maxCooldownGun;
-
-	scene.add(plazma);
+	this.guns[this.gunKind].shot(this);
+	this.cooldownGun = this.maxCooldownGun;	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.startRocket = function() {
 	var missile, x, y;
 
-	if (this.cooldownGun > 0) return;
+	if (this.cooldownRocket > 0) return;
 
 	x = this.x + 20 * Math.sin(this.a) + this.rokcetPoint * 8.0 * Math.sin(this.a + Math.PI/2.0);
 	y = this.y + 20 * Math.cos(this.a) + this.rokcetPoint * 8.0 * Math.cos(this.a + Math.PI/2.0);
@@ -478,7 +496,7 @@ tShatl.prototype.startRocket = function() {
 		this.missileCounts[this.missileKind] -= 1;
 	} else return;	
 
-	this.cooldownGun = this.maxCooldownGun;
+	this.cooldownRocket = this.maxCooldownRocket;
 	this.rokcetPoint = -1 * this.rokcetPoint;
 
 	scene.add(missile);

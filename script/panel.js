@@ -6,13 +6,14 @@ tPanel = function() {
 	this.Y2 = 0;
 	this.dX = 0;
 	this.dY = 0;
-	this.oldScore = 0;
 
 	this.textColor = "#444488";
 	this.barColor = "#005500";
 
 	this.oldTargets = [];
-	this.tools = {};	
+	this.tools = {};
+	this.maxGunKind = 0;
+	this.missiles = [];
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tPanel.prototype.build = function() {
@@ -26,25 +27,24 @@ tPanel.prototype.build = function() {
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tPanel.prototype.show = function() {
-	if (!isEqualHash(this.tools, shatl.tools)) {		
-		this.copyTools();
-		this.hide();
-		return;
-	}
-
-	this.body();	
-
 	var x = this.X1 + 20, y = this.Y1 + 40;
+	if (this.dY < 670) y -= 10;
+
+	this.clear();
+	this.body();		
 	this.score(x, y); 
 	y -= 20;
 
 	ctx.font = "16px Arial";
 
-	y += 50; this.speed(x, y);   
-	y += 50; this.power(x, y);   
-	y += 50; this.helm(x, y);
-    
-	if (shatl.tools.drag)     { y += 50; this.drag(x, y); }
+	if (this.dY >= 720) { y += 50; this.speed(x, y); }
+	
+	if (this.dY >= 870) {
+		y += 50; this.power(x, y);   
+		y += 50; this.helm(x, y);
+		if (shatl.tools.drag)     { y += 50; this.drag(x, y); }
+	}
+
 	if (shatl.tools.cooldown) { y += 50; this.cooldown(x, y); } 
 	if (shatl.tools.shield)   { y += 50; this.shield(x, y); } 
 
@@ -55,12 +55,23 @@ tPanel.prototype.show = function() {
 	if (shatl.tools.stability) { y += 30; this.helmStabilization(x, y); }
 	if (shatl.tools.targets)   { y += 30; this.targets(x, y); }
 
+	if (shatl.maxGunKind > 0)  { y += 40; this.gunPanel(x, y); y += 20; }
+
 	y += 20;
 	var i = -1, shift = [ {dx: - 5, dy: 0}, {dx: 85, dy: 0}, {dx: - 5, dy: 90}, {dx: 85, dy: 90} ];
 	if (shatl.missileCounts.heavyMissile  >= 0)  { i++; this.rocketPanel(x + shift[i].dx, y + shift[i].dy, 'heavyMissile',  '1'); }
 	if (shatl.missileCounts.smartMissile  >= 0)  { i++; this.rocketPanel(x + shift[i].dx, y + shift[i].dy, 'smartMissile',  '2'); }
 	if (shatl.missileCounts.plazmaMissile >= 0)  { i++; this.rocketPanel(x + shift[i].dx, y + shift[i].dy, 'plazmaMissile', '3'); }
 	if (shatl.missileCounts.megaMissile   >= 0)  { i++; this.rocketPanel(x + shift[i].dx, y + shift[i].dy, 'megaMissile',   '4'); }	
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tPanel.prototype.clear = function() {
+	if (!isEqualHash(this.tools, shatl.tools) || this.maxGunKind != shatl.maxGunKind || !isEqualArray(this.missiles, Object.keys(shatl.missileCounts))) {		
+		this.missiles = copyArrays(Object.keys(shatl.missileCounts));		
+		this.maxGunKind = shatl.maxGunKind;
+		this.copyTools();
+		this.hide();	
+	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tPanel.prototype.hide = function() {	
@@ -83,21 +94,19 @@ tPanel.prototype.copyTools = function() {
 	for (var key in shatl.tools ) this.tools[key] = shatl.tools[key];	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tPanel.prototype.score = function(x, y) {
-	var score = shatl.score;
-
+tPanel.prototype.score = function(x, y) {	
 	ctx.fillStyle = this.textColor;
 	ctx.font = "16px Arial";
 	ctx.fillText("Score", x, y);
 
 	ctx.font = "18px Arial";
-	ctx.fillStyle = "#000000";		
-	ctx.fillText(this.oldScore, x + 60, y);
+	ctx.beginPath();
+	ctx.fillStyle = "#000000";	
+	ctx.rect(x + 50, y - 18, 110, 26);
+	ctx.fill();
 
 	ctx.fillStyle = "#6666BB";		
-	ctx.fillText(score, x + 60, y);
-	
-	this.oldScore = score;
+	ctx.fillText(shatl.score, x + 60, y);		
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tPanel.prototype.speed = function(x, y) {
@@ -413,6 +422,26 @@ tPanel.prototype.showMeteorites = function(x, y) {
 			}				
 		}
         }	
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tPanel.prototype.gunPanel = function(x, y) {	
+	ctx.fillStyle = this.textColor;	
+	ctx.fillText("Gun power(g)", x, y);
+
+	for(var i = 0; i < 4; i++) {
+		ctx.beginPath();
+		ctx.lineWidth = 1;		
+		
+		ctx.strokeStyle = "#000066";		
+		ctx.rect(x, y + 10, 30, 10);	
+		ctx.stroke();		
+				
+		if (i < shatl.gunKind) ctx.fillStyle = this.barColor;
+		else ctx.fillStyle = "#000000";		
+		ctx.fill();
+
+		x += 40;
+	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tPanel.prototype.rocketPanel = function(x, y, key, hint) {

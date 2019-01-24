@@ -34,27 +34,14 @@ function tPotestat(params) {
 
 	this.score = 20;
 	this.hitCount = 10;
+	this.gun = new tPowerGun();
 	
 	this.setParam(params);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tPotestat.prototype.bang = function() {
-	var dx, dy, plazma;	
-	
+tPotestat.prototype.bang = function() {	
         if (this.cooldownGun > 0) return;
-
-	dx = this.dx + 10 * Math.sin(this.a);
-	dy = this.dy + 10 * Math.cos(this.a);
-	
-	for (var i = 0; i < 8; i++) {
-		plazma = new tPlazma({ x: this.x + (2.0 - Math.random() * 4.0) + (this.r + 10) * Math.sin(this.a), 
-			  	       y: this.y + (2.0 - Math.random() * 4.0) + (this.r + 10) * Math.cos(this.a), 
-                          	       dx: dx, 
-                                       dy: dy,
-			               m: 10.0 });
-		scene.add(plazma);		
-	}
-
+	this.gun.shot(this);
 	this.cooldownGun = this.maxCooldownGun;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
