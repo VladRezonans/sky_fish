@@ -12,9 +12,6 @@ function tMineral(params) {
 	this.lockT = 0.1;
 	this.f = 10.0;
 	this.score = 10;
-
-	this.glint = true;
-	this.oldGlint = true;
 		
 	this.setParam(params);
 	this.t = this.t + 0.2 * this.t * Math.random();
@@ -50,14 +47,8 @@ tMineral.prototype.engine = function() {
 	this.t     -= 0.01;
 	if (this.t < 0) this.destroy();
 
-	if (MINERAL_COUNT > MINERAL_MAX - 200 && this.t < 0.2 * this.maxT) this.destroy();
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tMineral.prototype.shadow = function(x, y) {
-	ctx.beginPath();
-	ctx.fillStyle = '#000000';
-	ctx.arc(x, y, this.r + 1.0, 0, 2 * Math.PI);	
-	ctx.fill();
+	if (MINERAL_COUNT > MINERAL_MAX - 200 && this.t > 0.8 * this.maxT) this.destroy();
+	if (MINERAL_COUNT > MINERAL_MAX && this.t > 0.5) this.destroy();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tMineral.prototype.shablon = function(x, y) {
@@ -70,32 +61,15 @@ tMineral.prototype.shablon = function(x, y) {
 tMineral.prototype.show = function() {
 	var x = this.x - sceneX;
 	var y = this.y - sceneY;
-	
-	if (this.isShadow(x, y)) return;
 
-	this.shadow(this.oldX, this.oldY);			
+	if (this.isShadow(x, y)) return;
 	this.shablon(x, y);
-	this.oldX = x; this.oldY = y;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tMineral.prototype.isShadow = function(x, y) {		
-	if (++scene.mineralShowCount < 500) return false;
-
-	this.glint = false;
-	if ((500.0 / scene.mineralShowCount) * Math.random() > 0.8) this.glint = true;
-
-	if (this.oldGlint == true && this.glint == false) {
-		this.shadow(this.oldX, this.oldY);
-		this.oldGlint = false;
-		if (MINERAL_COUNT > MINERAL_MAX) this.destroy();
-		
-	}	
-	if (this.glint == false) return true;
-
-	this.oldGlint = true;
-	this.glint = false;
-
-	return false;
+tMineral.prototype.isShadow = function(x, y) {
+	if (++scene.mineralShowCount > scene.oldMineralShowCount - 500) return false;
+	if (Math.random() > (scene.oldMineralShowCount - scene.mineralShowCount + 1.0)/(scene.oldMineralShowCount + 1.0)) return false;
+	return true;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tMineral.prototype.hide = function() {

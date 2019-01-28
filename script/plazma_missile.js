@@ -6,15 +6,12 @@ function tPlazmaMissile(params) {
 	this.status = 'norm';
 	this.r = 10;
 	this.color = '#226622';
-	
-	this.oldX = 600.0;
-	this.oldY = 600.0;
-	this.x = this.oldX;
-	this.y = this.oldY;
+
+	this.x = 600;
+	this.y = 600;
 	this.dx = 0.0;
 	this.dy = 0.0;
 
-	this.oldA = 0.0;
 	this.a = Math.PI;	
 
 	this.v = 0.0;
@@ -28,7 +25,7 @@ function tPlazmaMissile(params) {
 	this.sensitiveR = 60;
 	this.might = 5;
 
-	this.goals = ['meteorite', 'angel', 'arhAngel', 'principat', 'potestat', 'reward']; 
+	this.goals = GOALS;
 	
 	this.setParam(params);	
 }

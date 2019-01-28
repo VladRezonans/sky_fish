@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-extend(tPrincipat, tArhAngel);
+extend(tPrincipates, tArhAngel);
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-function tPrincipat(params) {
-	this.type =   'principat';
+function tPrincipates(params) {
+	this.type =   'principates';
 	this.group =  'physical';
 	this.status = 'norm';
 
@@ -11,10 +11,11 @@ function tPrincipat(params) {
 	this.r = 8;
 	this.x = 600;
 	this.y = 300;
-	this.dx = 0;	
+	this.dx = 0;
 	this.dy = 0;
 	this.a = 1.5;
-	this.da = 0;	
+	this.da = 0;
+	this.lockT = 0.1;
 
 	this.m = Math.pow(this.r/2.0, 3);
 
@@ -25,7 +26,7 @@ function tPrincipat(params) {
 	this.rightPower = false;
 	this.leftPowerValue = 0;
 	this.rightPowerValue = 0;
-	this.oldLeftPowerValue = 0; 
+	this.oldLeftPowerValue = 0;
 	this.oldRightPowerValue = 0;
 
 	this.maxCooldownGun = 20.0;
@@ -35,25 +36,23 @@ function tPrincipat(params) {
 	this.shield = true;
 	this.cooldownShield = 0.0;
 	this.maxCooldownShield = 5.0;
-	
+
 	this.score = 40;
-	
+
 	this.setParam(params);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tPrincipat.prototype.behaviorExtended = function() {	
-	var a = angle(this, shatl) - Math.PI;	
-	
+tPrincipates.prototype.behaviorExtended = function() {
+	var a = angle(this, shatl) - Math.PI;
+
         if (shatl.a > a - 0.02 && shatl.a < a + 0.02) {
 		if (this.da >=  0) {
 			this.leftPower = false;
-			this.rightPower = true;			
-		
+			this.rightPower = true;
 		} else {
 			this.leftPower = true;
 			this.rightPower = false;
-			
-		}	
+		}
 	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------

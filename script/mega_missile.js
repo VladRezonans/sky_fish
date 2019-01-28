@@ -6,15 +6,12 @@ function tMegaMissile(params) {
 	this.status = 'norm';
 	this.r = 12;
 	this.color = '#226622';
-	
-	this.oldX = 600.0;
-	this.oldY = 600.0;
-	this.x = this.oldX;
-	this.y = this.oldY;
+
+	this.x = 600;
+	this.y = 600;
 	this.dx = 0.0;
 	this.dy = 0.0;
 
-	this.oldA = 0.0;
 	this.a = Math.PI;
 	this.da = 0.008;
 
@@ -30,7 +27,7 @@ function tMegaMissile(params) {
 	this.targetR = 2000;
 	this.might = 10;
 
-	this.goals = ['meteorite', 'angel', 'arhAngel', 'principat', 'potestat', 'reward']; 
+	this.goals = GOALS;
 	
 	this.setParam(params);	
 }

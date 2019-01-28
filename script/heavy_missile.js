@@ -6,15 +6,12 @@ function tHeavyMissile(params) {
 	this.status = 'norm';
 	this.r = 8;
 	this.color = '#226622';
-	
-	this.oldX = 600.0;
-	this.oldY = 600.0;
-	this.x = this.oldX;
-	this.y = this.oldY;
+
+	this.x = 0;
+	this.y = 0;
 	this.dx = 0.0;
 	this.dy = 0.0;
 
-	this.oldA = 0.0;
 	this.a = Math.PI;
 	this.da = 0.00;
 
@@ -29,14 +26,13 @@ function tHeavyMissile(params) {
 	this.sensitiveR = 40;
 	this.might = 5;
 
-	this.goals = ['meteorite', 'angel', 'arhAngel', 'principat', 'potestat', 'reward']; 
+	this.goals = GOALS;
 	
 	this.setParam(params);	
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 tHeavyMissile.prototype.checkTargets = function() {	
 	var r, target;	
-
 
 	for (var i = 0; i < scene.elements.length; i++) {
 		target = scene.elements[i];			
@@ -74,32 +70,6 @@ tHeavyMissile.prototype.engine = function() {
 	this.lockT -= 0.01;
 	this.t -= 0.01;
 	if (this.t < 0) this.bang();	
-}
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-tHeavyMissile.prototype.shadowTail = function(x, y, a) {
-	var x1, y1;
-	ctx.lineWidth = 3;
-	ctx.strokeStyle = '#000000';
-	ctx.beginPath();	
-
-	x1 = x - this.r * Math.sin(a);
-	y1 = y - this.r * Math.cos(a);
-	ctx.moveTo(x1, y1);
-
-	x1 = x - (this.r + 100 * this.v + 9) * Math.sin(a);
-	y1 = y - (this.r + 100 * this.v + 9) * Math.cos(a);
-	ctx.lineTo(x1, y1);
-
-	ctx.stroke();
-}
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-tHeavyMissile.prototype.shadow = function(x, y, a) {
-	ctx.beginPath();
-	ctx.arc(x, y, this.r + 3, 0, 2 * Math.PI);
-	ctx.fillStyle = '#000000';
-	ctx.fill();
-
-	this.shadowTail(x, y, a);
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 tHeavyMissile.prototype.shablonTail = function(x, y, a) {
@@ -166,15 +136,9 @@ tHeavyMissile.prototype.shablon = function(x, y, a) {
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tHeavyMissile.prototype.show = function() {
 	var x = this.x - sceneX;
-	var y = this.y - sceneY;	
-	
-	this.shadow(this.oldX, this.oldY, this.oldA);
+	var y = this.y - sceneY;
+
 	this.shablon(x, y, this.a);
-	this.oldX = x; this.oldY = y; this.oldA = this.a;
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tHeavyMissile.prototype.hide = function() {
-	this.shadow(this.oldX, this.oldY, this.oldA);	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tHeavyMissile.prototype.bang = function() {

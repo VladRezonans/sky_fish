@@ -52,9 +52,12 @@ function onKeyDown(evt) {
 				case 50: shatl.switchMissile('smartMissile');  break;
 				case 51: shatl.switchMissile('plazmaMissile'); break;
 				case 52: shatl.switchMissile('megaMissile');   break;
+
+				case 19: scene.switchPause(); break;
+				case 27: scene.switchPause(); break;
 			}
-		}         
-	} 	
+		}
+	}
 }
 //----------------------------------------------------------------------------------------------------------
 function onKeyUp(evt) {

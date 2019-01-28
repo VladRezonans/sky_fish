@@ -73,21 +73,32 @@ tDoubleGun.prototype.shot = function(shooter) {
 //-----------------------------------------------------------------------------------------------------------------------------------------------------
 function tPowerGun() {
 	this.type = 'powerGun';
-	this.maxCooldownGun = 12.0	
+	this.maxCooldownGun = 12.0;
+	this.plazmaCount = 8;
+	this.square = 2.0;
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------------------
 tPowerGun.prototype.shot = function(shooter) {
 	var dx = shooter.dx + 10 * Math.sin(shooter.a);
 	var dy = shooter.dy + 10 * Math.cos(shooter.a);
-	var plazma;	
-	        
-	for (var i = 0; i < 8; i++) {
-		plazma = new tPlazma({ x: shooter.x + (2.0 - Math.random() * 4.0) + (shooter.r + 10) * Math.sin(shooter.a), 
-			  	       y: shooter.y + (2.0 - Math.random() * 4.0) + (shooter.r + 10) * Math.cos(shooter.a), 
-                          	       dx: dx, 
-                                       dy: dy,
-			               m: 14.0 });
-		scene.add(plazma);		
-	}	
+	var plazma;
+
+	for (var i = 0; i < this.plazmaCount; i++) {
+		plazma = new tPlazma({ x: shooter.x + (this.square - Math.random() * 2.0 * this.square) + (shooter.r + 10) * Math.sin(shooter.a),
+				       y: shooter.y + (this.square - Math.random() * 2.0 * this.square) + (shooter.r + 10) * Math.cos(shooter.a),
+				       dx: dx,
+				       dy: dy,
+				       m: 14.0 });
+		scene.add(plazma);
+	}
+}
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+extend(tDiffuseGun, tPowerGun);
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+function tDiffuseGun() {
+	this.type = 'diffuseGun';
+	this.maxCooldownGun = 14.0;
+	this.plazmaCount = 10;
+	this.square = 8.0;
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------------------

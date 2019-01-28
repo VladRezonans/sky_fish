@@ -14,7 +14,8 @@ function tAngel(params) {
 	this.dx = 0;	
 	this.dy = 0;
 	this.a = 2.0;
-	this.da = 0;	
+	this.da = 0;
+	this.lockT = 0.1;
 
 	this.m = Math.pow(this.r/2.0, 3);
 
@@ -84,6 +85,12 @@ tAngel.prototype.engine = function() {
 	this.engineHelm();
 	this.engineMove();
 	this.engineExtended();
+	this.engineLock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+tAngel.prototype.engineLock = function() {
+	this.lockT -= 0.01;
+	if (this.lockT < 0) this.lockT = 0;
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 tAngel.prototype.behavior = function() {	
@@ -110,52 +117,6 @@ tAngel.prototype.behavior = function() {
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 tAngel.prototype.behaviorExtended = function() {
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tAngel.prototype.shadowTail = function(x, y, a, leftValue, rightValue) {
-	var x1, y1;	
-	var r = this.r + 3;
-	var dv = 0.008;	
-
-	ctx.lineWidth = 3;
-	ctx.strokeStyle = "#000000";
-
-	// left
-	ctx.beginPath();
-	x1 = x + r * Math.sin(a + Math.PI/2.0) + 2.0 * Math.sin(a);
-	y1 = y + r * Math.cos(a + Math.PI/2.0) + 2.0 * Math.cos(a);
-	ctx.moveTo(x1, y1);
-
-	x1 = x1 - 1000 * (leftValue + dv) * Math.sin(a);
-	y1 = y1 - 1000 * (leftValue + dv) * Math.cos(a);
-	ctx.lineTo(x1, y1);
-	ctx.stroke();
-
-	// right
-	ctx.beginPath();
-	x1 = x - r * Math.sin(a + Math.PI/2.0) + 2.0 * Math.sin(a);
-	y1 = y - r * Math.cos(a + Math.PI/2.0) + 2.0 * Math.cos(a);
-	ctx.moveTo(x1, y1);
-
-	x1 = x1 - 1000 * (rightValue + dv) * Math.sin(a);
-	y1 = y1 - 1000 * (rightValue + dv) * Math.cos(a);
-	ctx.lineTo(x1, y1);
-	ctx.stroke();
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tAngel.prototype.shadow = function(x, y, a, leftValue, rightValue) {
-	var x1, y1;	
-
-	ctx.lineWidth = 3;
-	ctx.strokeStyle = "#000000";
-       
-	// body	
-	ctx.beginPath();	
-	ctx.arc(x, y, this.r, 0, 2 * Math.PI);	
-	ctx.stroke();	
-
-	// tail
-	this.shadowTail(x, y, a, leftValue, rightValue);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tAngel.prototype.shablonTail = function(x, y, a, leftValue, rightValue) {
@@ -189,6 +150,9 @@ tAngel.prototype.shablonTail = function(x, y, a, leftValue, rightValue) {
 	ctx.stroke();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
+tAngel.prototype.shablonShield = function(x, y) {
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 tAngel.prototype.shablon = function(x, y, a, leftValue, rightValue) {
 	var x1, y1;	
 
@@ -200,6 +164,9 @@ tAngel.prototype.shablon = function(x, y, a, leftValue, rightValue) {
 	ctx.arc(x, y, this.r, 0, 2 * Math.PI);	
 	ctx.stroke();
 
+	// shield
+	this.shablonShield(x, y);
+
 	// tail
 	this.shablonTail(x, y, a, leftValue, rightValue);
 }
@@ -208,16 +175,7 @@ tAngel.prototype.show = function() {
 	var x = this.x - sceneX;
 	var y =  this.y - sceneY;	
 	
-	this.shadow(this.oldX, this.oldY, this.oldA, this.oldLeftPowerValue, this.oldRightPowerValue);
 	this.shablon(x, y, this.a, this.leftPowerValue, this.rightPowerValue, true);
-
-	this.oldX = x; this.oldY = y; this.oldA = this.a;
-	this.oldLeftPowerValue = this.leftPowerValue; 
-	this.oldRightPowerValue = this.rightPowerValue;
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tAngel.prototype.hide = function() {
-	this.shadow(this.oldX, this.oldY, this.oldA, this.oldLeftPowerValue, this.oldRightPowerValue);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tAngel.prototype.bang = function() {
@@ -253,5 +211,34 @@ tAngel.prototype.hit = function(plazmaDx, plazmaDy) {
 tAngel.prototype.destroy = function() {
 	if (Math.random() * 15 > 14) scene.add(new tReward({ x: this.x, y: this.y }));
 	this.status = 'delete';	
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tAngel.prototype.touch = function(ob) {
+	if (this.lockT > 0 || shatl.score < 500000) return;
+
+	if (ob.status == 'norm' && this.status == 'norm' && ob.type =='angel' && this.type =='angel') {
+		this.status = 'delete';
+		ob.status = 'delete';
+
+		newOb = new tArhAngel({ x: this.x + (this.x - ob.x)/2.0, y: this.y + (this.y - ob.y)/2.0 });
+		scene.add(newOb);
+		this.salute(newOb);
+	}
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tAngel.prototype.salute = function(newOb) {
+	var i, dx, dy;
+
+	for (i = 0; i < 30; i++) {
+		dx = Math.random() * 5.0 - 2.5;
+		dy = Math.random() * 5.0 - 2.5;
+
+		scene.add(new tMineral({ x: newOb.x, y: newOb.y,
+					 dx: dx, dy: dy,
+					 t: 2.0,
+					 lockT: 0.5,
+					 score: 1,
+					 color: "'#444488'" }));
+	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------

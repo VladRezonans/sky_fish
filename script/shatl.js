@@ -5,16 +5,13 @@ function tShatl() {
 	this.type = 'shatl';
 	this.group = 'physical';
 	this.status = 'norm';
-	this.oldX = 600;
-	this.oldY = 300;
-	this.x = this.oldX;
-	this.y = this.oldY; 
+	this.x = 600;
+	this.y = 300;
 	this.r = 10.0;
 	this.m = Math.pow(this.r/2.0, 3);
-	this.oldV = 0.0;
 	this.v = 0.0;
 	this.a = Math.PI/2.0;
-	this.da = 0.0;		
+	this.da = 0.0;
 	this.dx = 0.0;
 	this.dy = 0.0;
 
@@ -50,7 +47,7 @@ tShatl.prototype.setTools = function() {
 	this.targetsShow = true;
 	this.shieldPower = false;
 		
-	this.tools = { cooldown: true, stability: true, targets: true };	
+	this.tools = { cooldown: true, stability: true, targets: true };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.setGuns = function() {
@@ -58,13 +55,14 @@ tShatl.prototype.setGuns = function() {
 	this.maxCooldownGun = 4.0;
 	this.gunKind = 0;
 	this.maxGunKind = 0;
+	this.userChoice = false;
 	
 	this.guns = [ new tSingleGun(), new tDoubleGun(), new tTripleGun(), new tMultiGun(), new tPowerGun() ];	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.increaseMaxGunKind = function() {	
 	if (this.maxGunKind < this.guns.length - 1) this.maxGunKind++;
-	if (this.gunKind == this.maxGunKind - 1) {
+	if (this.userChoice == false) {
 		this.gunKind = this.maxGunKind;
 		this.maxCooldownGun = this.guns[this.gunKind].maxCooldownGun;
 	}
@@ -75,7 +73,7 @@ tShatl.prototype.setRockets = function() {
 	this.maxCooldownRocket = 12.0;
 	this.rokcetPoint = 1;
 	this.missileKind = '';
-	this.missileCounts = {};	
+	this.missileCounts = {};
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.turnOn = function() {
@@ -105,17 +103,18 @@ tShatl.prototype.rightOff = function() {
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.dragOn = function() {
+	this.cruiseControl = false;
+
 	if (this.tools.drag) {
 		this.dragPower = true;
 		this.rocketPower = false;
-		this.cruiseControl = false;
 	}	
 } 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.dragOff = function() {
 	if (this.tools.drag) {
 		this.dragPower = false;
-	}	
+	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.cruiseControlSwitch = function() {
@@ -159,6 +158,7 @@ tShatl.prototype.switchGun = function() {
 	this.gunKind++;
 	if (this.gunKind > this.maxGunKind) this.gunKind = 0;
 	this.maxCooldownGun = this.guns[this.gunKind].maxCooldownGun;
+	this.userChoice = true;
 }			
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.engineShield = function() {
@@ -243,95 +243,6 @@ tShatl.prototype.engine = function() {
 
 	this.cooldownRocket -= 0.1;
 	if (this.cooldownRocket	< 0) this.cooldownRocket = 0;
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tShatl.prototype.shadowTail = function(x, y, a,  v, color) {
-	var x1, y1;
-
-	ctx.lineWidth = 4;
-	ctx.strokeStyle = color;
-	ctx.beginPath();	
-
-	x1 = x - this.r * Math.sin(a);
-	y1 = y - this.r * Math.cos(a);
-	ctx.moveTo(x1, y1);
-
-	x1 = x - (this.r + 2000 * v + 2) * Math.sin(a);
-	y1 = y - (this.r + 2000 * v + 2) * Math.cos(a);
-	ctx.lineTo(x1, y1);
-
-	ctx.stroke();
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------
-tShatl.prototype.shadowHelm = function(x, y, a, color, leftPowerValue, rightPowerValue) {
-	var x1, y1;
-
-	ctx.lineWidth = 3;
-	ctx.strokeStyle = color;
-
-	// left
-	ctx.beginPath();
-	x1 = x + (this.r - 3.0) * Math.sin(a + Math.PI/2.0) + 6.0 * Math.sin(a);
-	y1 = y + (this.r - 3.0) * Math.cos(a + Math.PI/2.0) + 6.0 * Math.cos(a);
-	ctx.moveTo(x1, y1);
-
-	x1 = x + (this.r + 20000 * leftPowerValue + 1.0) * Math.sin(a + Math.PI/2.0) + 6.0 * Math.sin(a);
-	y1 = y + (this.r + 20000 * leftPowerValue + 1.0) * Math.cos(a + Math.PI/2.0) + 6.0 * Math.cos(a);
-	ctx.lineTo(x1, y1);
-	ctx.stroke();
-
-	// right
-	ctx.beginPath();
-	x1 = x - (this.r - 3.0) * Math.sin(a + Math.PI/2.0) + 6.0 * Math.sin(a);
-	y1 = y - (this.r - 3.0) * Math.cos(a + Math.PI/2.0) + 6.0 * Math.cos(a);
-	ctx.moveTo(x1, y1);
-
-	x1 = x - (this.r + 20000.0 * rightPowerValue + 1.0) * Math.sin(a + Math.PI/2.0) + 6.0 * Math.sin(a);
-	y1 = y - (this.r + 20000.0 * rightPowerValue + 1.0) * Math.cos(a + Math.PI/2.0) + 6.0 * Math.cos(a);
-	ctx.lineTo(x1, y1);
-	ctx.stroke();
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------
-tShatl.prototype.shadowDrag = function(x, y, a, color, dragPowerValue) {
-	var x1, y1;
-
-	ctx.lineWidth = 3;
-	ctx.strokeStyle = color;
-
-	// left
-	ctx.beginPath();
-	x1 = x + (this.r - 3.0) * Math.sin(a + Math.PI/2.0) + 12.0 * Math.sin(a);
-	y1 = y + (this.r - 3.0) * Math.cos(a + Math.PI/2.0) + 12.0 * Math.cos(a);
-	ctx.moveTo(x1, y1);
-
-	x1 = x + (this.r - 3.0) * Math.sin(a + Math.PI/2.0) + 12.0 * Math.sin(a) + (2000 * dragPowerValue + 1.0) * Math.sin(a);
-	y1 = y + (this.r - 3.0) * Math.cos(a + Math.PI/2.0) + 12.0 * Math.cos(a) + (2000 * dragPowerValue + 1.0) * Math.cos(a);
-	ctx.lineTo(x1, y1);
-	ctx.stroke();
-
-	// right
-	ctx.beginPath();
-	x1 = x - (this.r - 3.0) * Math.sin(a + Math.PI/2.0) + 12.0 * Math.sin(a);
-	y1 = y - (this.r - 3.0) * Math.cos(a + Math.PI/2.0) + 12.0 * Math.cos(a);
-	ctx.moveTo(x1, y1);        
-
-	x1 = x - (this.r - 3.0) * Math.sin(a + Math.PI/2.0) + 12.0 * Math.sin(a) + (2000 * dragPowerValue + 1.0) * Math.sin(a);
-	y1 = y - (this.r - 3.0) * Math.cos(a + Math.PI/2.0) + 12.0 * Math.cos(a) + (2000 * dragPowerValue + 1.0) * Math.cos(a);;
-	ctx.lineTo(x1, y1);
-	ctx.stroke();
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tShatl.prototype.shadow = function(x, y, a, v, color, leftPowerValue, rightPowerValue, dragPowerValue) {
-	var x1, y1;
-	
-	ctx.beginPath();
-	ctx.arc(x, y, 1.5 * this.r + 2.0, 0, 2 * Math.PI);
-	ctx.fillStyle = color;
-	ctx.fill();
-	
-	this.shadowTail(x, y, a, v, color);
-	this.shadowHelm(x, y, a, color, leftPowerValue, rightPowerValue);
-	this.shadowDrag(x, y, a, color, dragPowerValue);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.shablonShield = function(x, y) {
@@ -464,11 +375,8 @@ tShatl.prototype.shablon = function(x, y, a, width, color, leftPowerValue, right
 tShatl.prototype.show = function() {	
 	var x = this.x - sceneX;
 	var y =  this.y - sceneY;	
-	
-	this.shadow(this.oldX, this.oldY, this.oldA, this.oldV, '#000000', this.oldLeftPowerValue, this.oldRightPowerValue, this.oldDragPowerValue);
+
 	this.shablon(x, y, this.a, 1, '#8888FF', this.leftPowerValue, this.rightPowerValue, this.dragPowerValue);
-	this.oldX = x; this.oldY = y; this.oldA = this.a; this.oldV = this.v;
-	this.oldLeftPowerValue = this.leftPowerValue; this.oldRightPowerValue = this.rightPowerValue; this.oldDragPowerValue = this.dragPowerValue;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.bang = function() {
@@ -479,7 +387,7 @@ tShatl.prototype.bang = function() {
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.startRocket = function() {
-	var missile, x, y;
+	var missile, params, x, y;
 
 	if (this.cooldownRocket > 0) return;
 

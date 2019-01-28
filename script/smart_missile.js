@@ -6,17 +6,14 @@ function tSmartMissile(params) {
 	this.status = 'norm';
 	this.r = 4;
 	this.color = '#226622';
-	
-	this.oldX = 600.0;
-	this.oldY = 600.0;
-	this.x = this.oldX;
-	this.y = this.oldY;
+
+	this.x = 600;
+	this.y = 600;
 	this.dx = 0.0;
 	this.dy = 0.0;
 
-	this.oldA = 0.0;
 	this.a = Math.PI;
-	this.da = 0.04;
+	this.da = 0.02;
 
 	this.v = 0.0;
 	this.dv = 0.01;
@@ -30,7 +27,7 @@ function tSmartMissile(params) {
 	this.targetR = 2000;
 	this.might = 2;	
 	
-	this.goals = ['meteorite', 'angel', 'arhAngel', 'principat', 'potestat', 'reward']; 
+	this.goals = GOALS;
 	
 	this.setParam(params);	
 }

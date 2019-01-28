@@ -10,11 +10,9 @@ function tReward(params) {
 	this.textColor = "#FFD700"
 
 	this.r = 16;
-	this.m = Math.pow(this.r/3.0, 3);	
-	this.oldX = 600;
-	this.oldY = 600;
-	this.x = this.oldX;
-	this.y = this.oldY;
+	this.m = Math.pow(this.r/3.0, 3);
+	this.x = 600;
+	this.y = 600;
 	this.dx = 0;	
 	this.dy = 0;
 	this.a1 = 0;
@@ -105,13 +103,6 @@ tReward.prototype.hit = function(x, y) {
 	if (this.lockT == 0) this.rewarding(x, y);	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tReward.prototype.shadow = function(x, y, color) {
-	ctx.beginPath();
-	ctx.fillStyle = color;
-	ctx.arc(x, y, this.r + 4, 0, 2 * Math.PI);	
-	ctx.fill();
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
 tReward.prototype.shablon = function(x, y) {
 	ctx.beginPath();
 	ctx.lineWidth = 2;
@@ -133,13 +124,7 @@ tReward.prototype.shablon = function(x, y) {
 tReward.prototype.show = function() {
 	var x = this.x - sceneX;
 	var y = this.y - sceneY;
-	
-	this.shadow(this.oldX, this.oldY, '#000000');
+
 	this.shablon(x, y);
-	this.oldX = x; this.oldY = y;
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-tReward.prototype.hide = function() {
-	this.shadow(this.oldX, this.oldY, '#000000');
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
