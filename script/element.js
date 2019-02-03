@@ -102,4 +102,22 @@ function toDegrees(a) {
 	return Math.floor(180.0 * a/Math.PI);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
+function isArrayIncludes(a, element) {
+	if (a == element) return true;
 
+	for (var i = 0; i < a.length; i++) {
+		if (a[i] === element) return true;
+	}
+	return false;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+function detectMobile() {
+	var str = ['Mobile', 'Android', 'webOS', 'iPhone', 'iPad', 'iPod', 'BlackBerry', 'Windows Phone'];
+
+	for (var i = 0; i < str.length; i++) {
+		if (navigator.userAgent.indexOf(str[i]) > -1) return true;
+	}
+
+	return false;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------

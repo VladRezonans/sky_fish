@@ -4,6 +4,7 @@ extend(tSmartMissile, tHeavyMissile);
 function tSmartMissile(params) {
 	this.type = 'smartMissile';
 	this.status = 'norm';
+	this.group = 'missiles';
 	this.r = 4;
 	this.color = '#226622';
 
@@ -29,17 +30,17 @@ function tSmartMissile(params) {
 	
 	this.goals = GOALS;
 	
-	this.setParam(params);	
+	this.setParam(params);
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 tSmartMissile.prototype.checkTargets = function() {
 	var r, target, enemy;
 	var dx, dy, a1, a2, da, minDa = 2.0 * Math.PI;
 
-	for (var i = 0; i < scene.elements.length; i++) {
-		target = scene.elements[i];			
+	for (var i = 0; i < scene.elements.physical.length; i++) {
+		target = scene.elements.physical[i];
 
-		if (target.status == 'norm' && this.goals.includes(target.type)) {
+		if (target.status == 'norm' && isArrayIncludes(this.goals, target.type)) {
 			r = radius(this, target);
 
 			if (r < this.sensitiveR + target.r) {

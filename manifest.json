@@ -1,0 +1,7 @@
+{
+  "short_name": "SF",
+  "name": "Sky Fish",
+  "start_url": "/sky_fish/SkyFish.html",
+  "display": "fullscreen",
+  "orientation": "landscape"
+}

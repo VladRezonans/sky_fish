@@ -3,3 +3,5 @@ It is necessary to control a small spacecraft, find asteroid fields, destroy the
 The arrow buttons control the forward movement and turn right and left. For shooting use the button "C". On the panel on the right there are tips on management. Also there is a radar, you are in the center, and your goal is marked with a green dot.
 
 Demo: https://vladrezonans.github.io/sky_fish/SkyFish.html
+
+Version 1.3 adds support for mobile browsers.

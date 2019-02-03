@@ -3,19 +3,32 @@ tScene = function() {
 	this.X1 = 0;
 	this.Y1 = 0;
 	
-	this.maxStar = 10;
+	this.maxStar = isMobile ? 5 : 10;
 	this.maxAsteroid = 12;
 	this.currentCellX = 0;
 	this.currentCellY = 0;
 
 	this.mineralShowCount = 0;
 	this.oldMineralShowCount = 0;
-	this.elements = [];
+	this.elements = { stars: [], physical: [], minerals: [], missiles: [], plazma: [], bangs: [] };
 	this.add(shatl);
 
 	this.delayScreen = [];
 	this.pause = false;
-}	
+
+	this.mobileShiftX = 200;
+	this.mobileShiftY = 200;
+
+	this.accTestInit();
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.accTestInit = function() {
+    this.acceleration = 1;
+    this.fps = 0;
+    this.testAcc = true;
+    this.time = new Date().getTime();
+    this.accCount = 0;
+}
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.build = function() {
 	this.X2 = canvas.width;
@@ -37,18 +50,47 @@ tScene.prototype.setViewSpace = function() {
 	this.viewY2 = sceneY + this.dY + 400;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tScene.prototype.render = function() {	
+tScene.prototype.render = function() {
 	if (!this.pause) this.engine();
 	this.show();
+
+	if (this.testAcc) this.accelerationTest();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-tScene.prototype.engine = function() {	
+tScene.prototype.accelerationTest = function() {
+    var time = new Date().getTime();
+    this.fps++;
+    if (time > this.time + 1000) {
+        this.acceleration = Math.floor(100/this.fps);
+        if (this.acceleration < 1) this.acceleration = 1;
+        this.fps = 0;
+        this.time = time;
+        this.accCount++;
+    }
+
+    if (this.accCount == 3) this.testAcc = false;
+
+    this.showHelpInfo(this.acceleration);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.showHelpInfo = function(info) {
+    ctx.fillStyle = "#555599";
+    ctx.font = "14px Arial";
+    ctx.fillText(info, this.X2 - 15, 15);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.engine = function() {
 	this.removeGarbage();
-	this.engineElements();	
+
+	for (var i = 0; i < this.acceleration; i++) {
+		this.engineElements();
+		this.shift();
+	}
+
+	this.physical();
 	this.move();
 	this.checkSpaceCell();
 	this.checkAsteroids();
-	this.physical();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.show = function() {
@@ -56,9 +98,12 @@ tScene.prototype.show = function() {
 	if (this.pause) this.showPause();
 
 	this.mineralShowCount = 0;
-	for (var i = 0; i < this.elements.length; i++) {
-		if (this.elements[i].type == 'star') this.elements[i].show(); 
-		else if (this.isPresentScene(this.elements[i])) this.elements[i].show();				 
+	for (var key in this.elements) {
+		var  group = this.elements[key];
+		for (var i = 0; i < group.length; i++) {
+			if (key == 'stars') group[i].show();
+			else if (this.isPresentScene(group[i])) group[i].show();
+		}
 	}
 	this.oldMineralShowCount = this.mineralShowCount;
 	panel.show();
@@ -70,14 +115,11 @@ tScene.prototype.isPresentScene = function(ob) {
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.physical = function() {
-	var physicals = [];
+	var physicals = [], ob;
 
-	for (var i = 0; i < this.elements.length; i++) {
-		if (this.elements[i].status == 'norm' && this.elements[i].group == 'physical') {			
-			if (this.isPresentScene(this.elements[i])) {								
-				physicals.push(this.elements[i]);
-			}
-		}
+	for (var i = 0; i < this.elements.physical.length; i++) {
+		ob = this.elements.physical[i];
+		if (ob.status == 'norm' && this.isPresentScene(ob)) physicals.push(ob);
         }
 			
 	this.physicalCellsContact(physicals);
@@ -91,8 +133,8 @@ tScene.prototype.physicalContact = function (physicals) {
 		first = physicals[i];
 		
 		for (var k = i + 1; k < physicals.length; k++) {
-			second = physicals[k];	
-				
+			second = physicals[k];
+
 			dx = first.x - second.x;
 			dy = first.y - second.y;
 			dr = first.r + second.r;
@@ -163,12 +205,8 @@ tScene.prototype.physicalCellsContact = function(physicals) {
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.initStars = function() {
-	var x, y, dx, dy;	
-
-	for(var k = 1; k < this.elements.length; k++) {
-		if(this.elements[k].type == 'star') this.elements[k].status = 'delete';
-	}	
-	this.removeGarbage();	
+	var x, y, dx, dy;
+	var stars = [];
 
 	for (dx = -3; dx < 4; dx++) {
 		x = this.currentCellX + dx;
@@ -182,16 +220,31 @@ tScene.prototype.initStars = function() {
 				star.setParam({ x: x * this.dX + Math.floor(Math.random() * this.dX), 
 		                                y: y * this.dY + Math.floor(Math.random() * this.dY), 
 		                                z: 1.0 + Math.random() * 2.0 });
-				this.elements.push(star);
+				stars.push(star);
 					
 			}
 		}
-	}	
+	}
+	this.elements.stars = stars;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.shift = function() {
+	if (shatl.tools.shift && shatl.shiftFlag) {
+		if (shatl.shiftUp)    sceneY -= 12.0;
+		if (shatl.shiftDown)  sceneY += 12.0;
+		if (shatl.shiftRight) sceneX -= 12.0;
+		if (shatl.shiftLeft)  sceneX += 12.0;
+	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.move = function() {	
-	var mDx = shatl.dx/shatl.maxSpeed * 0.7;
-	var mDy = shatl.dy/shatl.maxSpeed * 0.7;
+	isMobile ? this.mobileMove() : this.pcMove();
+	this.setViewSpace();
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.pcMove = function() {
+	var mDx = shatl.dx/shatl.maxSpeed * 0.6;
+	var mDy = shatl.dy/shatl.maxSpeed * 0.6;
 
 	this.delayScreen.push({ mDx: mDx, mDy: mDy });
 	var h = (this.delayScreen.length < 100) ? this.delayScreen[0] : this.delayScreen.shift();
@@ -199,13 +252,27 @@ tScene.prototype.move = function() {
 	for(var i = 0; i < this.delayScreen.length; i++) { h.mDx += this.delayScreen[i].mDx; h.mDy += this.delayScreen[i].mDy };
 	h.mDx = h.mDx/(this.delayScreen.length + 1);
 	h.mDy = h.mDy/(this.delayScreen.length + 1);
-	
-	if (shatl.x < sceneX + 0.15 * this.dX - h.mDx * this.dX) sceneX = shatl.x - 0.15 * this.dX + h.mDx * this.dX;
-	if (shatl.y < sceneY + 0.15 * this.dY - h.mDy * this.dY) sceneY = shatl.y - 0.15 * this.dY + h.mDy * this.dY;
-	if (shatl.x > sceneX + 0.85 * this.dX - h.mDx * this.dX) sceneX = shatl.x - 0.85 * this.dX + h.mDx * this.dX;
-	if (shatl.y > sceneY + 0.85 * this.dY - h.mDy * this.dY) sceneY = shatl.y - 0.85 * this.dY + h.mDy * this.dY;
-	
-	this.setViewSpace();
+
+	this.moveFrame(h.mDx * this.dX, h.mDy * this.dY);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.moveFrame = function(dx, dy) {
+	if (shatl.x < sceneX + 0.2 * this.dX - dx) sceneX = shatl.x - 0.2 * this.dX + dx;
+	if (shatl.y < sceneY + 0.2 * this.dY - dy) sceneY = shatl.y - 0.2 * this.dY + dy;
+	if (shatl.x > sceneX + 0.8 * this.dX - dx) sceneX = shatl.x - 0.8 * this.dX + dx;
+	if (shatl.y > sceneY + 0.8 * this.dY - dy) sceneY = shatl.y - 0.8 * this.dY + dy;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.mobileMove = function() {
+	sceneX = shatl.x - this.mobileShiftX;
+	sceneY = shatl.y - this.mobileShiftY;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.shiftFrame = function() {
+	if (this.mobileShiftX < 0.2 * this.dX) this.mobileShiftX = 0.2 * this.dX;
+	if (this.mobileShiftY < 0.2 * this.dY) this.mobileShiftY = 0.2 * this.dY;
+	if (this.mobileShiftX > 0.8 * this.dX) this.mobileShiftX = 0.8 * this.dX;
+	if (this.mobileShiftY > 0.8 * this.dY) this.mobileShiftY = 0.8 * this.dY;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.checkSpaceCell = function() {
@@ -220,19 +287,21 @@ tScene.prototype.checkSpaceCell = function() {
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.checkAsteroids = function() {
-	var x, y, dx, dy, count = 0;
+	var ob, x, y, dx, dy, count = 0;
 	var space = 100000.0;
 
-	for (var i = 0; i < this.elements.length; i++) {
-		if (this.elements[i].status == 'norm' && this.elements[i].type == 'asteroid') {
-			dx = this.elements[i].x - shatl.x;
-			dy = this.elements[i].y - shatl.y; 
+	for (var i = 0; i < this.elements.physical.length; i++) {
+		ob = this.elements.physical[i];
 
-			if ( dx * dx + dy * dy > 1.5 * space * space) this.elements[i].status = 'delete';
+		if (ob.status == 'norm' && ob.type == 'asteroid') {
+			dx = ob.x - shatl.x;
+			dy = ob.y - shatl.y;
+
+			if ( dx * dx + dy * dy > 1.5 * space * space) ob.status = 'delete';
 			else count++;			
 		}
         }	
-	
+
 	Math.seedrandom();
 
 	if (count == 0)  {	
@@ -259,12 +328,13 @@ tScene.prototype.createAsteroidStream = function(streamX, streamY) {
 tScene.prototype.removeDistantObjects = function() {
 	var space = 100000.0;
 
-	for (var i = 0; i < this.elements.length; i++) {
-		if (this.elements[i].status == 'norm') {
-			dx = this.elements[i].x - shatl.x;
-			dy = this.elements[i].y - shatl.y;
+	for (var i = 0; i < this.elements.physical.length; i++) {
+		ob = this.elements.physical[i];
+		if (ob == 'norm') {
+			dx = ob.x - shatl.x;
+			dy = ob.y - shatl.y;
 
-			if ( dx * dx + dy * dy > 5.0 * space * space) this.elements[i].status = 'delete';
+			if ( dx * dx + dy * dy > 5.0 * space * space) ob.status = 'delete';
 		}
         }
 }
@@ -274,96 +344,90 @@ tScene.prototype.createEnemy = function(streamX, streamY, size) {
 
 	if (shatl.score > 100) {
 		for (i = 0; i < size/4; i++) {
-			x = streamX + this.dX * Math.random();
-			y = streamY + this.dY * Math.random();		
-			this.add(new tAngel({ x: x, y: y }));
+			this.add(new tAngel(this.placeInStream(streamX, streamY)));
 		}
 	}
 	
 	count = shatl.score/2000;
-	if (count > 80) count = 80;
+	if (count > 70) count = 70;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();		
-		this.add(new tAngel({ x: x, y: y }));
+		this.add(new tAngel(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/4000;
 	if (count > 60) count = 60;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();		
-		this.add(new tArhAngel({ x: x, y: y }));
+		this.add(new tArhAngel(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/6000;
 	if (count > 40) count = 40;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();		
-		this.add(new tPrincipates({ x: x, y: y }));
+		this.add(new tPrincipates(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/8000;
 	if (count > 30) count = 30;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();		
-		this.add(new tPotestates({ x: x, y: y }));
+		this.add(new tPotestates(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/25000;
 	if (count > 20) count = 20;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();
-		this.add(new tVirtutes({ x: x, y: y }));
+		this.add(new tVirtutes(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/50000;
-	if (count > 10) count = 10;
+	if (count > 12) count = 12;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();
-		this.add(new tDominationes({ x: x, y: y }));
+		this.add(new tDominationes(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/100000;
+	if (count > 10) count = 10;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();
-		this.add(new tThronos({ x: x, y: y }));
+		this.add(new tThronos(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/200000;
+	if (count > 8) count = 8;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();
-		this.add(new tCherubim({ x: x, y: y }));
+		this.add(new tCherubim(this.placeInStream(streamX, streamY)));
 	}
 
 	count = shatl.score/400000;
+	if (count > 6) count = 6;
 	for (i = 1; i < count; i++) {
-		x = streamX + this.dX * Math.random();
-		y = streamY + this.dY * Math.random();
-		this.add(new tSeraphim({ x: x, y: y }));
+		this.add(new tSeraphim(this.placeInStream(streamX, streamY)));
 	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
+tScene.prototype.placeInStream = function(streamX, streamY) {
+	return { x: streamX + this.dX * Math.random(), y: streamY + this.dY * Math.random() };
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.add = function(element) {
-	this.elements.push(element)
+	this.elements[element.group].push(element);
 }	
 //---------------------------------------------------------------------------------------------------------------------------------------------------	
 tScene.prototype.removeGarbage = function() {
-	var result = [];
-	for(var i = 0; i < this.elements.length; i++) {
-		if (this.elements[i].status != 'delete') result.push(this.elements[i]);
+	var result = { stars: [], physical: [], minerals: [], missiles: [], plazma: [], bangs: [] };
+
+	for (var key in this.elements) {
+		var  group = this.elements[key];
+		for (var i = 0; i < group.length; i++)
+			if (group[i].status != 'delete') result[key].push(group[i]);
 	}
+
 	this.elements = result;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.engineElements = function() {
-	for (var i = 0; i < this.elements.length; i++) this.elements[i].engine();
+	for (var key in this.elements) {
+		var  group = this.elements[key];
+		for (var i = 0; i < group.length; i++) group[i].engine();
+	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.switchPause = function() {
@@ -371,7 +435,8 @@ tScene.prototype.switchPause = function() {
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tScene.prototype.showPause = function() {
-	var x = (this.dX - panel.dX)/2.0 - 32, y = 100;
+	var x = this.dX/2.0 - 32, y = 100;
+	x = isMobile ? x : x - panel.dX/2.0;
 
 	ctx.fillStyle = "#555599";
 	ctx.font = "22px Arial";

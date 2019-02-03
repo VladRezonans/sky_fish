@@ -4,6 +4,7 @@ extend(tMineral, tShape);
 function tMineral(params) {
 	this.type = 'mineral';
 	this.status = 'norm';
+	this.group = 'minerals';
 	this.r = 2;
 	this.color = "#CCCC44";
 	this.dx = 0.0;

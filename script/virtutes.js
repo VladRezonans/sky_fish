@@ -26,8 +26,6 @@ function tVirtutes(params) {
 	this.rightPower = false;
 	this.leftPowerValue = 0;
 	this.rightPowerValue = 0;
-	this.oldLeftPowerValue = 0;
-	this.oldRightPowerValue = 0;
 
 	this.maxCooldownGun = 20.0;
 	this.cooldownGun = 0.0;
@@ -62,7 +60,7 @@ tVirtutes.prototype.behaviorExtended = function() {
 tVirtutes.prototype.startMissile = function() {
 	var params, x, y;
 
-	if (this.cooldownRocket > 0) return;
+	if (this.cooldownRocket > 0 || scene.elements.missiles.length > 16) return;
 
 	x = this.x + 20 * Math.sin(this.a) + Math.sin(this.a + Math.PI/2.0);
 	y = this.y + 20 * Math.cos(this.a) + Math.cos(this.a + Math.PI/2.0);

@@ -26,8 +26,6 @@ function tDominationes(params) {
 	this.rightPower = false;
 	this.leftPowerValue = 0;
 	this.rightPowerValue = 0;
-	this.oldLeftPowerValue = 0;
-	this.oldRightPowerValue = 0;
 
 	this.maxCooldownGun = 20.0;
 	this.cooldownGun = 0.0;
@@ -75,7 +73,7 @@ tDominationes.prototype.shablonShield = function(x, y) {
 tDominationes.prototype.startMissile = function() {
 	var params, x, y, rokcetPoint;
 
-	if (this.cooldownRocket > 0) return;
+	if (this.cooldownRocket > 0 || scene.elements.missiles.length > 16) return;
 
 	for (rokcetPoint = -1; rokcetPoint <= 1; rokcetPoint += 2) {
 		x = this.x + 20 * Math.sin(this.a) + rokcetPoint * 8.0 * Math.sin(this.a + Math.PI/2.0);

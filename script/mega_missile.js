@@ -4,6 +4,7 @@ extend(tMegaMissile, tSmartMissile);
 function tMegaMissile(params) {
 	this.type = 'megaMissile';
 	this.status = 'norm';
+	this.group = 'missiles';
 	this.r = 12;
 	this.color = '#226622';
 
@@ -29,7 +30,7 @@ function tMegaMissile(params) {
 
 	this.goals = GOALS;
 	
-	this.setParam(params);	
+	this.setParam(params);
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 tMegaMissile.prototype.shablon = function(x, y, a) {

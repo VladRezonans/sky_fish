@@ -26,8 +26,6 @@ function tPrincipates(params) {
 	this.rightPower = false;
 	this.leftPowerValue = 0;
 	this.rightPowerValue = 0;
-	this.oldLeftPowerValue = 0;
-	this.oldRightPowerValue = 0;
 
 	this.maxCooldownGun = 20.0;
 	this.cooldownGun = 0.0;

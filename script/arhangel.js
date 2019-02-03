@@ -28,9 +28,6 @@ function tArhAngel(params) {
 	this.leftPowerValue = 0;
 	this.rightPowerValue = 0;
 
-	this.oldLeftPowerValue = 0; 
-	this.oldRightPowerValue = 0;
-
 	this.maxCooldownGun = 30.0;
 	this.cooldownGun = 0.0;
 

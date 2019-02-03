@@ -4,6 +4,7 @@ extend(tStar, tShape);
 function tStar() {
 	this.type = 'star';
 	this.status = 'norm'
+	this.group = 'stars';
 	this.color = '#AAAAFF';
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------

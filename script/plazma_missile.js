@@ -4,6 +4,7 @@ extend(tPlazmaMissile, tHeavyMissile);
 function tPlazmaMissile(params) {
 	this.type = 'plazmaMissile';
 	this.status = 'norm';
+	this.group = 'missiles';
 	this.r = 10;
 	this.color = '#226622';
 
@@ -27,7 +28,7 @@ function tPlazmaMissile(params) {
 
 	this.goals = GOALS;
 	
-	this.setParam(params);	
+	this.setParam(params);
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 tPlazmaMissile.prototype.shablon = function(x, y, a) {

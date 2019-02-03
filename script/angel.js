@@ -26,8 +26,6 @@ function tAngel(params) {
 	this.rightPower = false;
 	this.leftPowerValue = 0;
 	this.rightPowerValue = 0;
-	this.oldLeftPowerValue = 0; 
-	this.oldRightPowerValue = 0;
 
 	this.maxCooldownGun = 30.0;
 	this.cooldownGun = 0.0;	
@@ -156,7 +154,7 @@ tAngel.prototype.shablonShield = function(x, y) {
 tAngel.prototype.shablon = function(x, y, a, leftValue, rightValue) {
 	var x1, y1;	
 
-	ctx.lineWidth = 1;
+	ctx.lineWidth = 1.2;
 	ctx.strokeStyle = this.color;
        
 	// body	
@@ -181,7 +179,7 @@ tAngel.prototype.show = function() {
 tAngel.prototype.bang = function() {
 	var dx, dy;		
 	
-        if (this.cooldownGun > 0) return;
+    if (this.cooldownGun > 0) return;
 
 	dx = this.dx + 15 * Math.sin(this.a);
 	dy = this.dy + 15 * Math.cos(this.a);

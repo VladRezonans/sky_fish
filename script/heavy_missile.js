@@ -4,6 +4,7 @@ extend(tHeavyMissile, tShape);
 function tHeavyMissile(params) {
 	this.type = 'heavyMissile';
 	this.status = 'norm';
+	this.group = 'missiles';
 	this.r = 8;
 	this.color = '#226622';
 
@@ -28,17 +29,18 @@ function tHeavyMissile(params) {
 
 	this.goals = GOALS;
 	
-	this.setParam(params);	
+	this.setParam(params);
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 tHeavyMissile.prototype.checkTargets = function() {	
 	var r, target;	
 
-	for (var i = 0; i < scene.elements.length; i++) {
-		target = scene.elements[i];			
+	for (var i = 0; i < scene.elements.physical.length; i++) {
+		target = scene.elements.physical[i];
 
-		if (target.status == 'norm' && this.goals.includes(target.type)) {
-			r = radius(this, target);			
+		if (target.status == 'norm' && isArrayIncludes(this.goals, target.type)) {
+			r = radius(this, target);
+
 			if (r < this.sensitiveR + target.r) {
 				this.bang();
 				break;	

@@ -23,13 +23,10 @@ function tShatl() {
 	this.leftPowerValue = 0.0;
 	this.rightPowerValue = 0.0;
 	this.dragPowerValue = 0.0;
-	this.oldLeftPowerValue = 0.0;
-	this.oldRightPowerValue = 0.0;
-	this.oldDragPowerValue = 0.0;
 
 	this.maxSpeed = 14.0;
 	this.maxPower = 0.02;
-	this.maxDragPower = 0.005;
+	this.maxDragPower = 0.008;
 	this.maxHelmPower = 0.0005;
 	this.shieldValue = 0;
 	this.maxShieldValue = 100;
@@ -37,6 +34,7 @@ function tShatl() {
 	this.setTools();
 	this.setGuns();
 	this.setRockets();
+	this.setShift();
 	
 	this.score = 0;
 }
@@ -47,7 +45,7 @@ tShatl.prototype.setTools = function() {
 	this.targetsShow = true;
 	this.shieldPower = false;
 		
-	this.tools = { cooldown: true, stability: true, targets: true };
+	this.tools = { cooldown: true, stability: true, targets: true, shift: true };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.setGuns = function() {
@@ -76,42 +74,75 @@ tShatl.prototype.setRockets = function() {
 	this.missileCounts = {};
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
+tShatl.prototype.setShift = function() {
+	this.shiftFlag = false;
+	this.shiftUp = false;
+	this.shiftDown = false;
+	this.shiftLeft = false;
+	this.shiftRight = false;
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.turnOn = function() {
+	if (this.tools.shift && this.shiftFlag) {
+		this.shiftUp = true;
+		return;
+	}
+
 	this.rocketPower = true;
+	this.dragPower = false;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.turnOff = function() {
+	this.shiftUp = false;
 	this.rocketPower = false;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.leftOn = function() {
+	if (this.tools.shift && this.shiftFlag) {
+		this.shiftLeft = true;
+		return;
+	}
+
 	this.leftPower = true;
 	this.rightPower = false;	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.leftOff = function() {
+	this.shiftLeft = false;
 	this.leftPower = false;	
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.rightOn = function() {
+	if (this.tools.shift && this.shiftFlag) {
+		this.shiftRight = true;
+		return;
+	}
+
 	this.rightPower = true;
 	this.leftPower = false;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.rightOff = function() {
+	this.shiftRight = false;
 	this.rightPower = false;
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.dragOn = function() {
+	if (this.tools.shift && this.shiftFlag) {
+		this.shiftDown = true;
+		return;
+	}
+
 	this.cruiseControl = false;
+	this.rocketPower = false;
 
 	if (this.tools.drag) {
 		this.dragPower = true;
-		this.rocketPower = false;
 	}	
 } 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.dragOff = function() {
+	this.shiftDown = false;
 	if (this.tools.drag) {
 		this.dragPower = false;
 	}
@@ -159,7 +190,15 @@ tShatl.prototype.switchGun = function() {
 	if (this.gunKind > this.maxGunKind) this.gunKind = 0;
 	this.maxCooldownGun = this.guns[this.gunKind].maxCooldownGun;
 	this.userChoice = true;
-}			
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+tShatl.prototype.choiceGun = function(gunKind) {
+	if (gunKind <= this.maxGunKind) {
+		this.gunKind = gunKind;
+		this.maxCooldownGun = this.guns[this.gunKind].maxCooldownGun;
+		this.userChoice = true;
+	}
+}
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 tShatl.prototype.engineShield = function() {
 	if (!this.tools.shield) return;
@@ -196,9 +235,15 @@ tShatl.prototype.engineHelm = function() {
 	if (this.a > 2.0 * Math.PI) this.a = this.a - 2.0 * Math.PI;
 	if (this.a < 0) this.a = this.a + 2.0 * Math.PI;
 
-        if (this.leftPower || this.rightPower) {
+	if (this.leftPower || this.rightPower) {
 		leftPower = this.leftPower;
 		rightPower = this.rightPower;
+
+	        if (this.tools.stability && this.helmStabilization) {
+	            if (this.da >  0.01)  leftPower = true;
+	            if (this.da <  -0.01) rightPower = true;
+		}
+
 	} else if (this.tools.stability && this.helmStabilization) {
 		if (this.da > 0) leftPower = true;
 		if (this.da < 0) rightPower = true;

@@ -2,10 +2,10 @@
 extend(tAsteroid, tShape);
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 function tAsteroid(params) {
-	this.color = '#666666';
 	this.type  = 'asteroid';
-	this.group = 'physical';
 	this.status = 'norm';
+	this.group = 'physical';
+	this.color = '#666666';
 	this.setParam(params);
 	this.r = 8.0 + Math.floor(Math.random() * 4.0);
 	this.m = Math.pow(this.r, 3);

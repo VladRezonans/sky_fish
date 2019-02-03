@@ -2,6 +2,10 @@ body {
 	background-color: black;
 }
 
+body, #screen, #canvas {
+	overflow: hidden;
+}
+
 #screen {
 	height: 99%;
 	width:	99%;

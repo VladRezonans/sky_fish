@@ -3,7 +3,8 @@ extend(tBang, tShape);
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 function tBang(params) {
 	this.type = 'bang';
-	this.status = 'normal';	
+	this.status = 'normal';
+	this.group = 'bangs';
 	this.color = "#FFD700";
 
 	this.x = 600;
@@ -14,7 +15,6 @@ function tBang(params) {
 	this.negativeR = - 2.0 * this.maxR;
 	this.dr = this.maxR/2.0;
 	this.might = 1;
-	this.goals = ['shatl'].concat(GOALS);
 
 	this.setParam(params);	
 }
@@ -51,10 +51,10 @@ tBang.prototype.show = function() {
 tBang.prototype.destroy = function() {
 	var dx, dy, r, target;	
 
-	for (var i = 0; i < scene.elements.length; i++) {
-		target = scene.elements[i];			
+	for (var i = 0; i < scene.elements.physical.length; i++) {
+		target = scene.elements.physical[i];
 
-		if (target.status == 'norm' && this.goals.includes(target.type)) {
+		if (target.status == 'norm') {
 			r = radius(this, target);			
 
 			if (r < this.maxR + target.r) {
